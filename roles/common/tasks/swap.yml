@@ -1,0 +1,17 @@
+---
+
+- name: Create a swapfile
+  command: creates={{ swap_path}} dd if=/dev/zero of={{ swap_path }} bs=1M count={{ swap_size }} 
+  register: swap_result
+  
+- name: Make swap
+  command: mkswap {{ swap_path }}
+  register: mkswap_result
+  when: swap_result != false
+
+- name: Make the swap persistence 
+  mount: name=none src={{ swap_path }} fstype=swap opts=sw state=present
+
+- name: Enabling the swap
+  command: swapon -a
+

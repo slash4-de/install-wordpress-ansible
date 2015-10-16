@@ -1,0 +1,6 @@
+# Iptables variables
+incoming:
+  - name: SSH
+    port: 22
+  - name: MySQL
+    port: 3306

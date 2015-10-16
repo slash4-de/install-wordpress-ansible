@@ -1,0 +1,23 @@
+---
+
+common_packages:
+    - vim
+    - screen
+    - sudo 
+    - htop
+    - strace
+    - curl
+    - wget
+    - git-core
+
+common_user: True
+common_swap: True
+
+# common_user variables
+common_users: 
+  - name: hussein
+    key: "{{ lookup('file', 'hussein.pub') }}"
+
+# common_swap variables
+swap_size: 512
+swap_path: /swapfile

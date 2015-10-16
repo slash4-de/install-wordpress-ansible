@@ -1,0 +1,215 @@
+#!/bin/sh
+
+set -e
+
+# Q: How do I get started?
+# A: (Did I mention "do not use it" already? Oh well.)
+#    1. Setup your normal iptables rules -- firewalling, port forwarding
+#       NAT, etc. When everything is configured the way you like, run:
+#
+#           /etc/init.d/iptables save active
+#
+#    2. Setup your your inactive firewall rules -- this can be something
+#       like clear all rules and set all policy defaults to accept (which
+#       can be done with /etc/init.d/iptables clear). When that is ready,
+#       save the inactive ruleset:
+#
+#           /etc/init.d/iptables save inactive
+#
+#    3. Controlling the script itself is done through runlevels configured
+#       with debconf for package installation. Run "dpkg-reconfigure iptables"
+#       to enable or disable after installation.
+#
+# Q: Is that all?
+# A: Mostly. You can save additional rulesets and restore them by name. As
+#    an example:
+#
+#       /etc/init.d/iptables save midnight
+#       /etc/init.d/iptables load midnight
+#
+#
+#    Autosave only works with start followed by stop.
+#
+#    Also, take great care with the halt option. It's almost as good as
+#    pulling the network cable, except it disrupts localhost too.
+#
+#    Also, create the /var/lib/iptables and /var/lib/ip6tables dirs
+#    as necessary.
+
+# enable ipv6 support
+enable_ipv6=false
+
+# set enable_autosave to "true" to autosave the active ruleset
+# when going from start to stop
+enable_autosave=false
+
+# set enable_save_counters to "true" to save table counters with
+# rulesets
+enable_save_counters=true
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+initd="$0"
+default="$0"
+
+initd_abort () {
+  cmd=$1
+  shift
+  echo "Aborting iptables $cmd: $@."
+  echo
+  usage
+  exit 0
+}
+
+initd_have_a_cow_man () {
+  for i in $@; do
+    if ! command -v "$i" >/dev/null 2>&1; then
+      echo "Aborting iptables initd: no $i executable"
+      exit 0
+    fi
+  done
+}
+
+initd_clear () {
+  rm -f "$autosave"
+  echo -n "Clearing ${iptables_command} ruleset: default ACCEPT policy"
+  $iptables_save | sed "/-/d;/^#/d;s/DROP/ACCEPT/" | $iptables_restore
+  echo "."
+}
+
+initd_halt () {
+  rm -f $autosave
+  echo -n "Clearing ${iptables_command} ruleset: default DROP policy"
+  $iptables_save | sed "/-/d;/^#/d;s/ACCEPT/DROP/" | $iptables_restore
+  echo "."
+}
+
+initd_load () {
+  ruleset="$libdir/$@"
+  if ! test -f "$ruleset"; then
+    initd_abort load "unknown ruleset, \"$@\""
+  fi
+  if test "$@" = inactive; then
+    initd_autosave
+  fi
+  rm -f "$autosave"
+  echo -n "Loading ${iptables_command} ruleset: load \"$@\""
+  $iptables_restore < "$ruleset"
+  echo "."
+}
+
+initd_counters () {
+  if test "${enable_save_counters:-false}" = true; then
+    echo -n " with counters"
+    $iptables_save -c > "$ruleset"
+  else
+    $iptables_save | sed '/^:/s@\[[0-9]\{1,\}:[0-9]\{1,\}\]@[0:0]@g' > "$ruleset"
+  fi
+}
+
+initd_save () {
+  rm -f $autosave
+  ruleset="${libdir}/$@"
+  echo -n "Saving ${iptables_command} ruleset: save \"$@\""
+  initd_counters
+  echo "."
+}
+
+initd_autosave () {
+  if test -f $autosave -a ${enable_autosave-false} = true; then
+    ruleset="${libdir}/active"
+    echo -n "Autosaving ${iptables_command} ruleset: save \"active\""
+    initd_counters
+    echo "."
+  fi
+}
+
+usage () {
+#  current="$(ls -m ${libdir} \
+#    | sed 's/ \{0,1\}autosave,\{0,1\} \{0,1\}//')"
+cat << END
+$initd options:
+ start|restart|reload|force-reload
+     load the "active" ruleset
+  save <ruleset>
+     save the current ruleset
+  load <ruleset>
+     load a ruleset
+  stop
+     load the "inactive" ruleset
+  clear
+     remove all rules and user-defined chains, set default policy to ACCEPT
+  halt
+     remove all rules and user-defined chains, set default policy to DROP
+
+Saved ruleset locations: /var/lib/iptables/ and /var/lib/ip6tables/
+
+Please read: $default
+
+END
+}
+
+initd_main () {
+  case "$1" in
+    start|restart|reload|force-reload)
+      initd_load active
+      if test ${enable_autosave-false} = true; then
+        touch $autosave
+      fi
+      ;;
+    stop)
+      initd_load inactive
+      ;;
+    clear)
+      initd_clear
+      ;;
+    halt)
+      initd_halt
+      ;;
+    save)
+      shift
+      if test -z "$*"; then
+        initd_abort save "no ruleset name given"
+      else
+        initd_save "$*"
+      fi
+      ;;
+    load)
+      shift
+      if test -z "$*"; then
+        initd_abort load "no ruleset name given"
+      else
+        initd_load "$*"
+      fi
+      ;;
+    save_active) #legacy option
+      initd_save active
+      ;;
+    save_inactive) #legacy option
+      initd_save inactive
+      ;;
+    *)
+      echo "$initd: unknown command: \"$*\""
+      usage
+      ;;
+  esac
+}
+
+initd_preload() {
+  iptables="/sbin/${iptables_command}"
+  iptables_save="${iptables}-save"
+  iptables_restore="${iptables}-restore"
+  libdir="/var/lib/${iptables_command}"
+  autosave="${libdir}/autosave"
+  initd_have_a_cow_man "$iptables_save" "$iptables_restore"
+  ${iptables_command} -nL >/dev/null
+  initd_main $*
+}
+
+iptables_command=iptables initd_preload $*
+if test "$enable_ipv6" = "true"; then
+  iptables_command=ip6tables initd_preload $*
+fi
+
+exit 0
+

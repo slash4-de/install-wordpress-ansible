@@ -1,0 +1,15 @@
+---
+
+- name: Install client and server packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - openssh-client
+    - openssh-server
+
+- name: Add openssh client settings
+  template: src=openssh_client.config dest=/etc/ssh/ssh_config owner=root group=root mode=644
+  notify: Restart Openssh
+
+- name: Add openssh server settings
+  template: src=openssh_server.config dest=/etc/ssh/sshd_config owner=root group=root mode=644
+  notify: Restart Openssh

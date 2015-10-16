@@ -1,0 +1,9 @@
+---
+- name: update rkhunter
+  command: "{{ item }}"
+  with_items:
+    - rkhunter --update
+    - rkhunter --propupd
+    - rkhunter --nomow --rwo -c
+  ignore_errors: yes
+

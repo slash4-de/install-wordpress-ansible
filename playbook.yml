@@ -1,0 +1,14 @@
+---
+ Provision Droplets
+- include: droplets.yml
+
+# Common tasks
+- hosts: "{{ hosts }}"
+  remote_user: root
+  gather_facts: force
+  roles:
+    - { role: common, tags: ["common"] }
+    - { role: openssh, tags: ["openssh"] }
+    - { role: fail2ban, tags: ["fail2ban"] }
+    - { role: rkhunter, tags: ["rkhunter"] }
+    - { role: iptables, tags: ["iptables"] }

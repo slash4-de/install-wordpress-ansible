@@ -1,0 +1,8 @@
+---
+
+- name: Install fail2ban package
+  apt: name=fail2ban state=present update_cache=yes
+
+- name: Add fail2ban template configuration
+  template: src=jail.local.j2 dest=/etc/fail2ban/jail.local mode=644 owner=root group=root
+  notify: Restart fail2ban

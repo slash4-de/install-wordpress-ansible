@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+ # Create Load Balancer droplets
+  tasks:
+
+    - name: Create Load Balancer Droplet
+      digital_ocean:
+        state: present
+        command: droplet
+        name: lb1
+        private_networking: yes
+        size_id: 66
+        image_id: 13089493
+        region_id: 7
+        ssh_key_ids: 430781
+        unique_name: yes
+        wait_timeout: 600
+      register: lb1
+
+    - name: Add Load Balancer to the Inventory.
+      add_host:
+        ansible_ssh_host: "{{ lb1.droplet.ip_address }}"
+        ansible_ssh_port: 22
+        name: lb1
+        groups: lbs, all_droplets
+      when: lb1.droplet is defined
+
+ # Create Application backend droplets
+ # app1
+    - name: Create Application server
+      digital_ocean:
+        state: present
+        command: droplet
+        name: app1
+        private_networking: yes
+        size_id: 66
+        image_id: 13089493
+        region_id: 7
+        ssh_key_ids: 430781
+        unique_name: yes
+        wait_timeout: 600
+      register: app1
+
+    - name: Add App Server to the Inventory.
+      add_host:
+        ansible_ssh_host: "{{ app1.droplet.ip_address }}"
+        ansible_ssh_port: 22
+        name: app1
+        groups: apps, all_droplets
+      when: app1.droplet is defined
+
+# Create Database servers backend
+    - name: Create Database servers
+      digital_ocean:
+        state: present
+        command: droplet
+        name: db1
+        private_networking: yes
+        size_id: 66
+        image_id: 13089493
+        region_id: 7
+        ssh_key_ids: 430781
+        unique_name: yes
+        wait_timeout: 600
+      register: db1
+
+    - name: Add Database Server to the Inventory.
+      add_host:
+        ansible_ssh_host: "{{ db1.droplet.ip_address }}"
+        ansible_ssh_port: 22
+        name: db1
+        groups: dbs, all_droplets
+      when: db1.droplet is defined
+      with_items: dbs_droplets
+
+- hosts:
+    - lbs
+    - dbs
+    - apps
+  remote_user: root
+  tasks:
+    - name: Wait for port 22 to become available.
+      local_action: "wait_for port=22 host={{ ansible_eth0.ipv4.address }}"

@@ -1,0 +1,16 @@
+---
+- name: Copy iptables init script
+  template: src=iptables.init dest=/etc/init.d/iptables mode=0700
+
+- name: Enable iptables init script
+  command: update-rc.d iptables defaults
+
+- name: Add iptables script
+  template: src=iptables.sh dest=/root/iptables_script.sh mode=0700
+  ignore_errors: yes
+
+- name: Create /var/lib/iptables
+  file: path=/var/lib/iptables state=directory
+
+- name: Run iptables script
+  command: /root/iptables_script.sh

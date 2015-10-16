@@ -1,0 +1,18 @@
+---
+- name: Install needed packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items: common_packages
+
+- name: Enable Screen Scrolling
+  lineinfile: dest=/etc/screenrc line="termcapinfo xterm* ti@:te@" insertafter=EOF
+
+- name: Install NTP
+  apt: name=ntp state=present update_cache=yes
+
+- name: Adding Swapfile
+  include: swap.yml
+  when: common_swap == True
+
+- name: Adding user
+  include: user.yml
+  when: common_user == True

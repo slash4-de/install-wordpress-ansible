@@ -1,0 +1,20 @@
+---
+ip_forward: 1
+
+incoming:
+  - name: SSH
+    port: 22
+
+outgoing:
+  - name: SSH
+    port: 22
+  - name: HTTP
+    port: 80
+  - name: HTTPS
+    port: 443
+  - name: SMTP1
+    port: 25
+  - name: SMTP2
+    port: 587
+  - name: SMTP3
+    port: 465
