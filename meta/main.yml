@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: Oliver Moser
+  author: slash4
   description: Install a high available, scalable wordpress cluster. Beta Test!
   company: slash4
   license: MIT
