@@ -10,3 +10,6 @@ In this series of posts, I will try to explain how to optimally set up a WordPre
     setting up a monitoring service
     and all that on a scalable and high available, load balanced infrastructure.
     … everything that you need to run and operate your business application on wordpress …
+
+
+Read more http://slash4.net/blog/devops/how-to-install-a-scalable-production-ready-wordpress-with-ansible-part-1.html
