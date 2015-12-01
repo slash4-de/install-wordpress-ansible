@@ -1,14 +1,36 @@
 ---
- Provision Droplets
-- include: droplets.yml
+#Provision Droplets
+#- include: droplets.yml
 
 # Common tasks
-- hosts: "{{ hosts }}"
-  remote_user: root
-  gather_facts: force
+- hosts: all
+  gather_facts: True
+  sudo: yes
   roles:
     - { role: common, tags: ["common"] }
     - { role: openssh, tags: ["openssh"] }
     - { role: fail2ban, tags: ["fail2ban"] }
     - { role: rkhunter, tags: ["rkhunter"] }
     - { role: iptables, tags: ["iptables"] }
+
+# Load Balancer(s) roles
+- hosts: lbs
+  sudo: yes
+  roles:
+    - { role: haproxy, tags: ["haproxy"] }
+
+# Application Server(s) roles
+- hosts: apps
+  sudo: yes
+  roles:
+    - { role: nginx, tags: ["nginx"] }
+    - { role: php5, tags: ["php5"] }
+    - { role: hhvm, tags: ["hhvm"] }
+  
+# Database Server(s) roles
+- hosts: dbs
+  sudo: yes
+  vars_files: 
+      - group_vars/mysql_passwords.yml
+  roles:
+    - { role: mysql, tags: ["mysql"] }

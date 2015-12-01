@@ -1,0 +1,98 @@
+user {{ nginx_user }} {% if nginx_user != nginx_group%} {{ nginx_group }}{% endif %};
+worker_processes  {{ ansible_processor_count }};
+{% if nginx_worker_rlimit_nofile %}
+worker_rlimit_nofile {{ nginx_worker_rlimit_nofile }};
+{% endif %}
+pid {{ nginx_pid }};
+daemon {{ nginx_daemon }};
+
+# event mod Configuration #
+###########################
+events {
+    # 1024
+    worker_connections  {{nginx_worker_connections }};
+    # 32
+    worker_aio_requests {{ nginx_worker_aio_requests }};
+    # on
+    accept_mutex {{ nginx_accept_mutex }};
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # logging options #
+    ###################
+    log_format  {{ nginx_log_name }}  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    # /var/log/nginx/access.log main
+    access_log  {{ nginx_access_log }} {{ nginx_log_name }};
+    # /var/log/nginx/error.log
+    error_log {{ nginx_error_log }};
+
+    # phusion passenger Configuration #
+    ###################################
+    {% if nginx_passenger %}
+    passenger_root {{ nginx_passenger_root }};
+    passenger_ruby {{ nginx_passenger_ruby }};
+    passenger_app_env {{ nginx_passenger_app_env }};
+    passenger_user_switching {{ nginx_passenger_user_switching }};
+    passenger_default_user {{ nginx_passenger_default_user }};
+    passenger_default_group {{ nginx_passenger_default_group }};
+    passenger_max_pool_size {{ nginx_passenger_max_pool_size }};
+    # 0 means no limit
+    passenger_max_instances_per_app {{ nginx_passenger_max_pool_size }};
+    # 300 seconds
+    passenger_pool_idle_time {{ nginx_passenger_pool_idle_time }};
+    {% endif %}
+
+    # Keepalive & Timeout Configurations #
+    ######################################
+    # 65
+    keepalive_timeout  {{nginx_keepalive_timeout}};
+    # 32
+    client_body_timeout  {{nginx_client_body_timeout}};
+    # 32
+    client_header_timeout  {{nginx_client_header_timeout}};
+    # 16
+    send_timeout  {{nginx_send_timeout}};
+    # on
+    sendfile {{ nginx_sendfile }};
+    # on
+    tcp_nopush {{ nginx_tcp_nopush }};
+
+    # gizp compression configuration #
+    ##################################
+    # on
+    gzip  {{ nginx_gzip }};
+    {% if nginx_gzip == "on" %}
+    # on
+    gzip_vary {{ nginx_gzip_vary }};
+    # any
+    gzip_proxied {{ nginx_gzip_proxied }};
+    # 6
+    gzip_comp_level {{ nginx_comp_level }};
+    # 16 8k
+    gzip_buffers {{ nginx_gzip_buffers.buffer_no }} {{ nginx_gzip_buffers.buffer_size }}k;
+    # 1.1
+    gzip_http_version {{ nginx_gzip_http_version }};
+    gzip_types {{nginx_gzip_types|join(' ')}};
+    {% endif %}
+
+    # Buffers Configurations #
+    ##########################
+    # 8k
+    client_body_buffer_size  {{nginx_client_body_buffer_size}};
+    # 1k
+    client_header_buffer_size  {{nginx_client_header_buffer_size}};
+    # 1m
+    client_max_body_size  {{nginx_client_max_body_size}};
+    # 32 | 64
+    server_names_hash_bucket_size {{nginx_server_names_hash_bucket_size}};
+    # 512
+    server_names_hash_max_size {{ nginx_server_names_hash_max_size }};
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}

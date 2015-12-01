@@ -49,7 +49,7 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
 iptables -A INPUT -p udp --sport 123 -j ACCEPT
 
 # Private Network
-{% for host in groups['all_droplets'] %}
+{% for host in groups['all'] %}
 iptables -A INPUT  -s {{ hostvars[host]['ansible_eth1']['ipv4']['address']}} -j ACCEPT
 iptables -A OUTPUT -d {{ hostvars[host]['ansible_eth1']['ipv4']['address']}} -j ACCEPT
 {% endfor %}

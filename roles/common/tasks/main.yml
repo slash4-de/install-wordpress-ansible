@@ -1,4 +1,7 @@
 ---
+- name: Set up the hostname
+  hostname: name={{ inventory_hostname }}
+
 - name: Install needed packages
   apt: name={{ item }} state=present update_cache=yes
   with_items: common_packages

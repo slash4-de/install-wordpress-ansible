@@ -1,0 +1,25 @@
+---
+
+- name: Include Gzip Configuration
+  include_vars: gzip.yml
+  when: nginx_gzip == "on"
+
+- name: Include Passenger Configuration
+  include_vars: passenger.yml
+  when: nginx_passenger | bool
+
+- name: Add Nginx Repository
+  apt_repository: repo="ppa:nginx/{{nginx_version}}" state=present
+  register: nginxrepo
+
+- name: Install Nginx
+  apt: pkg=nginx state=installed update_cache=true
+  notify: Start Nginx
+
+- name: Remove Default Site
+  file: dest=/etc/nginx/sites-enabled/default state=absent
+  when: nginx_delete_default | bool
+
+- name: Add Nginx Configuration
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  notify: Restart Nginx

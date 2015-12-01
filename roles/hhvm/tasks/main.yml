@@ -1,0 +1,12 @@
+---
+
+- name: Add apt key for hhvm
+  apt_key: url=http://dl.hhvm.com/conf/hhvm.gpg.key state=present
+
+- name: Add apt repo for hhvm
+  apt_repository: state=present repo="deb http://dl.hhvm.com/ubuntu {{ ansible_distribution_release }} main"
+
+- name: Install hhvm package
+  apt: name=hhvm update_cache=yes state=present
+  notify:
+      - Restart hhvm

@@ -1,0 +1,13 @@
+nginx_gzip_vary: "on"
+nginx_gzip_proxied: any
+nginx_comp_level: 6
+nginx_gzip_buffers: { buffer_no: 16, buffer_size: 8}
+nginx_gzip_http_version: 1.1
+nginx_gzip_types:
+    - text/plain
+    - text/css
+    - application/x-javascript
+    - text/xml
+    - application/xml
+    - application/xml+rss
+    - text/javascript

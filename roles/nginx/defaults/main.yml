@@ -1,0 +1,38 @@
+---
+nginx_version: "stable"
+nginx_delete_default: False
+
+# Nginx Configuration
+nginx_user: www-data
+nginx_group: www-data
+nginx_pid: /var/run/nginx.pid
+nginx_daemon: "on"
+
+nginx_worker_connections: 1024
+nginx_worker_aio_requests: 32
+nginx_worker_rlimit_nofile: null
+nginx_accept_mutex: "on"
+nginx_log_name: main
+nginx_access_log: /var/log/nginx/access.log
+nginx_error_log: /var/log/nginx/error.log
+
+# phusion passenger Configuration
+# passenger specific configuration at vars/passenger.yml
+nginx_passenger: False
+
+nginx_keepalive_timeout: 65
+nginx_client_body_timeout: 32
+nginx_client_header_timeout: 32
+nginx_send_timeout: 16
+nginx_sendfile: "on"
+nginx_tcp_nopush: "on"
+
+# gizp compression
+# gzip specific configuration at vars/gzip.yml
+nginx_gzip: "on"
+
+nginx_client_body_buffer_size: 8k
+nginx_client_header_buffer_size: 1k
+nginx_client_max_body_size: 1m
+nginx_server_names_hash_bucket_size: 32
+nginx_server_names_hash_max_size: 512

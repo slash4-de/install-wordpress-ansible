@@ -1,0 +1,9 @@
+nginx_passenger_root:"/usr/lib/ruby/gems/1.8/gems/passenger-3.0.21"
+nginx_passenger_ruby: "/usr/local/rvm/rubies/ruby-1.9.3-p547/bin/ruby"
+nginx_passenger_app_env: production
+nginx_passenger_user_switching: "on"
+nginx_passenger_default_user: www-data
+nginx_passenger_default_group: www-data
+nginx_passenger_max_pool_size: 6
+nginx_passenger_max_pool_size: 0
+nginx_passenger_pool_idle_time: 300
