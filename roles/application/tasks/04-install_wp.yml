@@ -1,0 +1,14 @@
+---
+
+- name: Download Wordpress to application dir
+  get_url: url=https://wordpress.org/latest.tar.gz dest=/tmp/latest.tar.gz mode=0644
+
+- name: Unarchive Wordpress
+  command: chdir={{app_dir}} creates={{app_dir}}/index.php tar --strip 1 -xvzf /tmp/latest.tar.gz
+
+- name: Change app dir permissions
+  file: recurse=yes path={{app_dir}} owner={{app_user}} group={{app_user}} state=directory
+
+- name: configure wordpress
+  template: src=wp-config.php.j2 dest={{app_dir}}/wp-config.php owner={{app_user}} group={{app_user}}
+  notify: Restart hhvm

@@ -1,0 +1,16 @@
+server {
+	listen 80 default_server;
+    server_name {{ app_site }};
+	root {{ app_dir }};
+	index index.php index.html index.htm;
+
+	location / {
+		try_files $uri $uri/ /index.php;
+	}
+	include hhvm.conf;
+	
+	location ~* ^.+\.(?:css|cur|js|jpe?g|gif|htc|bmp|ico|rtf|png|xml|otf|ttf|eot|woff|mid|midi|woff2|svg|png|ico|zip|tgz|gz|rar|bz2)$ {
+	expires max;
+	log_not_found off;
+	}
+}

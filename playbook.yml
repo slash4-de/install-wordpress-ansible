@@ -31,6 +31,19 @@
 - hosts: dbs
   sudo: yes
   vars_files: 
-      - group_vars/mysql_passwords.yml
+      - group_vars/passwords.yml
   roles:
     - { role: mysql, tags: ["mysql"] }
+
+# Installing the application on servers
+- hosts: all
+  sudo: yes
+  vars_files: 
+      - group_vars/passwords.yml
+  handlers:
+      - include: roles/hhvm/handlers/main.yml
+      - include: roles/nginx/handlers/main.yml
+      - include: roles/mysql/handlers/main.yml
+      - include: roles/haproxy/handlers/main.yml
+  roles:
+    - { role: application, tags: ["application"] }

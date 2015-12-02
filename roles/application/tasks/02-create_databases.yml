@@ -1,0 +1,5 @@
+- name: create a database for wordpress
+  mysql_db: name={{ db_name }} state=present
+
+- name: create database user for wordpress
+  mysql_user: name={{ db_user }} password={{ db_password }} state=present priv={{ db_name }}.*:ALL host='%'

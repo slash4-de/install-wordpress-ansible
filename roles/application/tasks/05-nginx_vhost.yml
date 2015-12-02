@@ -1,0 +1,16 @@
+---
+- name: add the vhost
+  template: src=wp_example.conf.j2 dest=/etc/nginx/sites-available/wp_example.conf
+  notify:
+      - Restart Nginx
+
+- name: add hhvm configuration file
+  template: src=hhvm.conf.j2 dest=/etc/nginx/hhvm.conf
+  notify:
+      - Restart Nginx
+
+- name: enable the vhost on app only
+  file: src=/etc/nginx/sites-available/wp_example.conf dest=/etc/nginx/sites-enabled/wp_example.conf state=link
+  notify:
+      - Restart Nginx
+

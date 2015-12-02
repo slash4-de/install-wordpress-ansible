@@ -4,7 +4,6 @@ worker_processes  {{ ansible_processor_count }};
 worker_rlimit_nofile {{ nginx_worker_rlimit_nofile }};
 {% endif %}
 pid {{ nginx_pid }};
-daemon {{ nginx_daemon }};
 
 # event mod Configuration #
 ###########################

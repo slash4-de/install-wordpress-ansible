@@ -1,0 +1,19 @@
+---
+## common tasks
+- include: 01-hosts_file.yml
+
+## database tasks
+- include: 02-create_databases.yml
+  when: server_role == 'db'
+
+## application tasks
+- include: 03-app_dir.yml
+  when: server_role == 'app'
+- include: 04-install_wp.yml
+  when: server_role == 'app'
+- include: 05-nginx_vhost.yml
+  when: server_role == 'app'
+
+## load balancers tasks
+- include: 06-add_haproxy.yml
+  when: server_role == 'lb'

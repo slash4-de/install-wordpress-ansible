@@ -1,0 +1,16 @@
+---
+- name: print all server names
+  debug: msg={{ item }}
+  with_items: groups['lbs']
+      
+- name: Add lbs servers ips to hosts file
+  lineinfile: dest=/etc/hosts insertafter="ff02::2 ip6-allrouters" line="{{ hostvars[item]['ansible_eth1']['ipv4']['address'] }} {{item}}" backup=yes
+  with_items: groups['lbs']
+
+- name: Add apps servers ips to hosts file
+  lineinfile: dest=/etc/hosts insertafter="ff02::2 ip6-allrouters" line="{{ hostvars[item]['ansible_eth1']['ipv4']['address'] }} {{item}}" backup=yes
+  with_items: groups['apps']
+
+- name: Add dbs servers ips to hosts file
+  lineinfile: dest=/etc/hosts insertafter="ff02::2 ip6-allrouters" line="{{ hostvars[item]['ansible_eth1']['ipv4']['address'] }} {{item}}" backup=yes
+  with_items: groups['dbs']

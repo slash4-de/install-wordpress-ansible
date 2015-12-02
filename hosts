@@ -6,3 +6,12 @@ db1
 
 [lbs]
 lb1
+
+[apps:vars]
+server_role=app
+
+[dbs:vars]
+server_role=db
+
+[lbs:vars]
+server_role=lb

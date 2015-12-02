@@ -1,1 +1,15 @@
 rkhunter_warning_mail: hgalal@example.com
+
+## Application role
+## ================
+#apps
+app_name: "example_app"
+app_site: "example.com"
+app_user: "www-data"
+app_dir: /var/www/{{app_name}}
+
+#dbs
+db_name: wordpress
+db_user: wpuser
+
+#lbs

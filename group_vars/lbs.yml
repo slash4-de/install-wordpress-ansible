@@ -6,3 +6,5 @@ incoming:
     port: 80
   - name: HTTPS
     port: 443
+  - name: HAPROXY_ADMIN
+    port: 8888
