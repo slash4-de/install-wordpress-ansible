@@ -33,3 +33,4 @@ php_packages:
   - php5-xsl
   - php5-fpm
 
+backup_files: True

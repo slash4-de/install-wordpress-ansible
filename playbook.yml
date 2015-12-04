@@ -47,3 +47,4 @@
       - include: roles/haproxy/handlers/main.yml
   roles:
     - { role: application, tags: ["application"] }
+    - { role: backup, tags: ["backup"] }

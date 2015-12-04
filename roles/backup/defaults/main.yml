@@ -1,0 +1,14 @@
+---
+
+backup_files: False
+backup_files_list:
+    - /var/www/
+    - /etc/
+    - /home/
+backup_files_dest: /backup/files
+cleanup_files: 3
+
+
+backup_dbs: False
+backup_dbs_dest: /backup/dbs
+cleanup_dbs: 3

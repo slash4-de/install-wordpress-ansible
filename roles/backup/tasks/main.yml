@@ -1,0 +1,43 @@
+---
+
+# Files backup
+- name: create files backup directory
+  file: path={{ backup_files_dest }} recurse=yes state=directory
+  when: backup_files == True
+
+- name: upload files backup script
+  template: src=backup_files.sh dest=/usr/local/bin/backup_files.sh mode=0700
+  when: backup_files == True
+
+- name: upload file cleanup script
+  template: src=cleanup_files.sh dest=/usr/local/bin/cleanup_files.sh mode=0700
+  when: backup_files == True
+
+- name: schedule file backup
+  cron: name="Backup files" minute="0" hour="3" day="*" job="/usr/bin/ionice -c2 -n7 /usr/local/bin/backup_files.sh"
+  when: backup_files == True
+
+- name: schedule file cleanup
+  cron: name="Cleanup files" minute="0" hour="4" day="*" job="/usr/bin/ionice -c2 -n7 /usr/local/bin/cleanup_files.sh"
+  when: backup_files == True
+
+# Database backup
+- name: create dbs backup directory
+  file: path={{ backup_dbs_dest }} recurse=yes state=directory
+  when: backup_dbs == True
+
+- name: upload database backup script
+  template: src=backup_dbs.sh dest=/usr/local/bin/backup_dbs.sh mode=0700
+  when: backup_dbs == True
+
+- name: upload database cleanup script
+  template: src=cleanup_dbs.sh dest=/usr/local/bin/cleanup_dbs.sh mode=0700
+  when: backup_dbs == True
+
+- name: schedule database backup
+  cron: name="Backup files" minute="0" hour="3" day="*" job="/usr/bin/ionice -c2 -n7 /usr/local/bin/backup_dbs.sh"
+  when: backup_dbs == True
+
+- name: schedule database cleanup
+  cron: name="Cleanup files" minute="0" hour="4" day="*" job="/usr/bin/ionice -c2 -n7 /usr/local/bin/cleanup_dbs.sh"
+  when: backup_dbs == True
